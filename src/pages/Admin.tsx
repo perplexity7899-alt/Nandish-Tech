@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLogin from "@/components/admin/AdminLogin";
 import AdminSidebar, { type AdminTab } from "@/components/admin/AdminSidebar";
 import DashboardOverview from "@/components/admin/DashboardOverview";
+import ClientsManager from "@/components/admin/ClientsManager";
 import ProjectsManager from "@/components/admin/ProjectsManager";
 import DeliverProjects from "@/components/admin/DeliverProjects";
 import AboutManager from "@/components/admin/AboutManager";
@@ -84,6 +85,7 @@ export default function Admin() {
 
   const panels: Record<AdminTab, React.ReactNode> = {
     dashboard: <DashboardOverview />,
+    clients: <ClientsManager />,
     projects: <ProjectsManager />,
     deliver: <DeliverProjects />,
     about: <AboutManager />,

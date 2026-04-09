@@ -71,6 +71,39 @@ export type Database = {
         }
         Relationships: []
       }
+      project_purchases: {
+        Row: {
+          id: string
+          user_id: string
+          project_id: string
+          price: number
+          currency: string
+          payment_id: string | null
+          payment_status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          project_id: string
+          price: number
+          currency: string
+          payment_id?: string | null
+          payment_status: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          project_id?: string
+          price?: number
+          currency?: string
+          payment_id?: string | null
+          payment_status?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
