@@ -24,12 +24,10 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      <div className="section-container flex items-center justify-between h-16">
-        <a href="#home" className="font-display text-xl font-bold flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/50 transition-all">
-            <span className="text-white font-bold text-sm"><strong>N T</strong></span>
-          </div>
-          <span className="text-primary font-bold tracking-tight">Nandish-Tech</span>
+      <div className="section-container flex items-center justify-between h-16 px-6">
+        <a href="#home" className="font-display font-bold flex items-center gap-5 group min-w-max pr-12">
+          <img src="/favicon.ico" alt="Nandish-Tech Logo" className="w-40 h-14 rounded-lg group-hover:shadow-lg group-hover:shadow-primary/50 transition-all flex-shrink-0" />
+          <span className="text-primary font-bold tracking-tight text-2xl whitespace-nowrap">Nandish-Tech</span>
         </a>
 
         {/* Desktop */}
