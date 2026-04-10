@@ -100,8 +100,7 @@ export default function ClientProjectsCatalog() {
                 <ProjectImageCarousel
                   images={project.images || []}
                   primaryImage={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover"
+                  title={project.title}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
@@ -139,52 +138,58 @@ export default function ClientProjectsCatalog() {
 
                 {/* Action Buttons */}
                 <div className="space-y-2 border-t border-border pt-3">
-                  {/* Links Row */}
-                  <div className="flex gap-1.5">
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => {
-                          if (isPaid && !access?.liveAccess) {
-                            e.preventDefault();
-                            toast.error("Unlock this project to view the live demo");
-                          }
-                        }}
-                        className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium transition-all inline-flex items-center justify-center gap-1 ${
-                          access?.liveAccess || !isPaid
-                            ? "bg-primary/10 text-primary hover:bg-primary/20 hover:shadow-lg cursor-pointer"
-                            : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-                        }`}
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        <span className="hidden sm:inline">Demo</span>
-                      </a>
-                    )}
+                  {/* Demo and Code Buttons - Always show */}
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        if (isPaid && !access?.hasAccess) {
+                          e.preventDefault();
+                          toast.error("Unlock this project to view the live demo");
+                        }
+                      }}
+                      className={`w-full py-2.5 px-4 rounded-lg text-sm font-semibold transition-all inline-flex items-center justify-center gap-2 ${
+                        access?.hasAccess || !isPaid
+                          ? "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg cursor-pointer"
+                          : "bg-blue-600/50 text-white/70 cursor-not-allowed"
+                      }`}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View Live Demo
+                    </a>
+                  )}
 
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => {
-                          if (isPaid && !access?.codeAccess) {
-                            e.preventDefault();
-                            toast.error("Unlock this project to view the source code");
-                          }
-                        }}
-                        className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium transition-all inline-flex items-center justify-center gap-1 ${
-                          access?.codeAccess || !isPaid
-                            ? "bg-accent/10 text-accent hover:bg-accent/20 hover:shadow-lg cursor-pointer"
-                            : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-                        }`}
-                      >
-                        <Github className="w-3 h-3" />
-                        <span className="hidden sm:inline">Code</span>
-                      </a>
-                    )}
-                  </div>
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        if (isPaid && !access?.hasAccess) {
+                          e.preventDefault();
+                          toast.error("Unlock this project to view the source code");
+                        }
+                      }}
+                      className={`w-full py-2.5 px-4 rounded-lg text-sm font-semibold transition-all inline-flex items-center justify-center gap-2 ${
+                        access?.hasAccess || !isPaid
+                          ? "bg-purple-600 hover:bg-purple-700 text-white hover:shadow-lg cursor-pointer"
+                          : "bg-purple-600/50 text-white/70 cursor-not-allowed"
+                      }`}
+                    >
+                      <Github className="w-4 h-4" />
+                      View Source Code
+                    </a>
+                  )}
+
+                  {/* Access Message */}
+                  {access?.hasAccess && (
+                    <div className="w-full py-2 px-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm font-medium flex items-center justify-center gap-2">
+                      <Check className="w-4 h-4" />
+                      You have access to this project
+                    </div>
+                  )}
 
                   {/* Purchase Button */}
                   {isPaid && !access?.hasAccess && (
@@ -205,15 +210,15 @@ export default function ClientProjectsCatalog() {
                         }).finally(() => setLoadingPayment(null));
                       }}
                       disabled={loadingPayment === project.id}
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-2 rounded-lg text-sm transition-all hover:shadow-lg"
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-2.5 rounded-lg transition-all hover:shadow-lg text-sm"
                     >
                       {loadingPayment === project.id ? (
                         <>
-                          <Loader2 className="w-3 h-3 animate-spin mr-1 inline" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
                           Processing...
                         </>
                       ) : (
-                        `Unlock - ₹${price}`
+                        `Unlock for ₹${price}`
                       )}
                     </Button>
                   )}
