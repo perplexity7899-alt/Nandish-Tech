@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: ["nandish-tech.onrender.com", "localhost", "127.0.0.1"],
+    allowedHosts: ["nandish-tech.onrender.com", "nandish-tech-1.onrender.com", "localhost", "127.0.0.1"],
     hmr: {
       overlay: false,
     },
@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
   preview: {
     host: "0.0.0.0",
     port: 8080,
-    allowedHosts: ["nandish-tech.onrender.com", "localhost", "127.0.0.1"],
+    allowedHosts: ["nandish-tech.onrender.com", "nandish-tech-1.onrender.com", "localhost", "127.0.0.1"],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
