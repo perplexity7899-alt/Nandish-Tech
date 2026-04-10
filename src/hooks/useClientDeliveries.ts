@@ -24,7 +24,7 @@ export interface ProjectDelivery {
 export function useClientDeliveries() {
   const { user } = useAuth();
 
-  // Fetch client's project deliveries
+  // Fetch client's project deliveries (only paid/unlocked projects)
   const {
     data: deliveries = [],
     isLoading,
@@ -38,6 +38,7 @@ export function useClientDeliveries() {
       console.log("📦 Fetching client deliveries for user:", user.id);
 
       try {
+        // Fetch all deliveries for the current user
         const { data, error } = await (supabase as any)
           .from("project_deliveries")
           .select("*, project:projects(*)")
@@ -53,7 +54,15 @@ export function useClientDeliveries() {
         data?.forEach((d: any) => {
           console.log(`📍 Delivery ${d.id}: project=${d.project?.title || "NO TITLE"}`);
         });
-        return data || [];
+        
+        // Filter deliveries to show only paid projects (projects with is_paid=true)
+        const paidDeliveries = (data || []).filter((delivery: any) => {
+          const isPaid = delivery.project?.pricing?.is_paid;
+          return isPaid === true || isPaid === undefined; // Show if explicitly paid or if no pricing info
+        });
+
+        console.log(`✅ Filtered ${paidDeliveries.length} paid deliveries from ${data?.length} total`);
+        return paidDeliveries || [];
       } catch (err: any) {
         console.error("❌ Fetch error:", err.message);
         return [];
