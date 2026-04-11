@@ -131,27 +131,33 @@ export default function ClientsManager() {
       {/* Clients Tabs */}
       <Card>
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full border-b rounded-none bg-transparent p-0">
+          <TabsList className="w-full border-b rounded-none bg-transparent p-0 flex flex-wrap">
             <TabsTrigger
               value="all"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary text-xs sm:text-sm flex-1 sm:flex-none whitespace-nowrap overflow-hidden"
             >
-              <Users className="w-4 h-4 mr-2" />
-              All Clients ({allClientsCount})
+              <Users className="w-4 h-4 mr-0.5 sm:mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">All Clients</span>
+              <span className="sm:hidden">All</span>
+              <span className="ml-0.5 sm:ml-1">({allClientsCount})</span>
             </TabsTrigger>
             <TabsTrigger
               value="registered"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary text-xs sm:text-sm flex-1 sm:flex-none whitespace-nowrap overflow-hidden"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Only Registered ({allClientsCount - purchasedClientsCount})
+              <Users className="w-4 h-4 mr-0.5 sm:mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Only Registered</span>
+              <span className="sm:hidden">Reg</span>
+              <span className="ml-0.5 sm:ml-1">({allClientsCount - purchasedClientsCount})</span>
             </TabsTrigger>
             <TabsTrigger
               value="purchased"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary text-xs sm:text-sm flex-1 sm:flex-none whitespace-nowrap overflow-hidden"
             >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              With Purchases ({purchasedClientsCount})
+              <ShoppingCart className="w-4 h-4 mr-0.5 sm:mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">With Purchases</span>
+              <span className="sm:hidden">Paid</span>
+              <span className="ml-0.5 sm:ml-1">({purchasedClientsCount})</span>
             </TabsTrigger>
           </TabsList>
 

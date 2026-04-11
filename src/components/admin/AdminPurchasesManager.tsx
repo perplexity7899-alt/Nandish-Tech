@@ -161,18 +161,26 @@ export default function AdminPurchasesManager() {
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="pending">
-            Pending <span className="ml-2 text-xs bg-yellow-500/20 px-2 py-1 rounded-full">{pendingPurchases.length}</span>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-0">
+          <TabsTrigger value="pending" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Pending</span>
+            <span className="sm:hidden">Pend</span>
+            <span className="ml-1 text-xs bg-yellow-500/20 px-1.5 sm:px-2 py-0.5 rounded-full">{pendingPurchases.length}</span>
           </TabsTrigger>
-          <TabsTrigger value="verified">
-            Verified <span className="ml-2 text-xs bg-blue-500/20 px-2 py-1 rounded-full">{verifiedPurchases.length}</span>
+          <TabsTrigger value="verified" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Verified</span>
+            <span className="sm:hidden">Veri</span>
+            <span className="ml-1 text-xs bg-blue-500/20 px-1.5 sm:px-2 py-0.5 rounded-full">{verifiedPurchases.length}</span>
           </TabsTrigger>
-          <TabsTrigger value="approved">
-            Approved <span className="ml-2 text-xs bg-green-500/20 px-2 py-1 rounded-full">{approvedPurchases.length}</span>
+          <TabsTrigger value="approved" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Approved</span>
+            <span className="sm:hidden">Appr</span>
+            <span className="ml-1 text-xs bg-green-500/20 px-1.5 sm:px-2 py-0.5 rounded-full">{approvedPurchases.length}</span>
           </TabsTrigger>
-          <TabsTrigger value="rejected">
-            Rejected <span className="ml-2 text-xs bg-red-500/20 px-2 py-1 rounded-full">{rejectedPurchases.length}</span>
+          <TabsTrigger value="rejected" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Rejected</span>
+            <span className="sm:hidden">Rej</span>
+            <span className="ml-1 text-xs bg-red-500/20 px-1.5 sm:px-2 py-0.5 rounded-full">{rejectedPurchases.length}</span>
           </TabsTrigger>
         </TabsList>
 
