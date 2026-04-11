@@ -13,6 +13,7 @@ import AboutManager from "@/components/admin/AboutManager";
 import ServicesManager from "@/components/admin/ServicesManager";
 import MessagesPanel from "@/components/admin/MessagesPanel";
 import PricingManager from "@/components/admin/PricingManager";
+import AdminPurchasesManager from "@/components/admin/AdminPurchasesManager";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -88,6 +89,7 @@ export default function Admin() {
     clients: <ClientsManager />,
     projects: <ProjectsManager />,
     deliver: <DeliverProjects />,
+    purchases: <AdminPurchasesManager />,
     about: <AboutManager />,
     services: <ServicesManager />,
     messages: <MessagesPanel />,

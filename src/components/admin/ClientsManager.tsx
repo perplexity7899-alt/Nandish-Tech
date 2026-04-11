@@ -45,11 +45,12 @@ export default function ClientsManager() {
         console.warn("Could not fetch purchases:", purchasesError);
       }
 
-      // Create a set of user IDs who have completed or pending purchases
+      // Create a set of user IDs who have made any purchases
       const purchasedUserIds = new Set<string>();
       if (purchases) {
         purchases.forEach((purchase: any) => {
-          if (purchase.user_id && (purchase.payment_status === "completed" || purchase.payment_status === "pending")) {
+          // Count any purchase record as a made purchase (regardless of payment_status)
+          if (purchase.user_id) {
             purchasedUserIds.add(purchase.user_id);
           }
         });
@@ -139,26 +140,33 @@ export default function ClientsManager() {
               All Clients ({allClientsCount})
             </TabsTrigger>
             <TabsTrigger
+              value="registered"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Only Registered ({allClientsCount - purchasedClientsCount})
+            </TabsTrigger>
+            <TabsTrigger
               value="purchased"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Purchased ({purchasedClientsCount})
+              With Purchases ({purchasedClientsCount})
             </TabsTrigger>
           </TabsList>
 
           {/* All Clients Tab */}
           <TabsContent value="all" className="p-6">
-            {allClients.length === 0 ? (
+            {clients.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  No clients without purchases yet. All registered clients have made purchases.
+                  No clients registered yet.
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {allClients.map((client) => (
+                {clients.map((client) => (
                   <div
                     key={client.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -195,6 +203,63 @@ export default function ClientsManager() {
                         </p>
                         <Badge variant="outline" className="mt-2">
                           No Purchase
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Only Registered Clients Tab */}
+          <TabsContent value="registered" className="p-6">
+            {allClients.length === 0 ? (
+              <div className="text-center py-12">
+                <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  All registered clients have made purchases. No clients without purchases.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {allClients.map((client) => (
+                  <div
+                    key={client.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                          <span className="text-sm font-bold text-yellow-700">
+                            {client.full_name?.charAt(0).toUpperCase() || "?"}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">{client.full_name}</p>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Mail className="w-3 h-3" />
+                              {client.email}
+                            </span>
+                            {client.phone && client.phone !== "N/A" && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="w-3 h-3" />
+                                {client.phone}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          Joined: {formatDate(client.created_at)}
+                        </p>
+                        <Badge variant="outline" className="mt-2 bg-yellow-50">
+                          Only Registered
                         </Badge>
                       </div>
                     </div>

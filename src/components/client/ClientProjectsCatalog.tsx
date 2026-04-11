@@ -2,9 +2,9 @@ import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Lock, Check, ExternalLink, Github, ShoppingCart } from "lucide-react";
+import { Loader2, Lock, Check, ExternalLink, Github, ShoppingCart, Clock, AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-import { checkProjectAccess, initiatePayment } from "@/integrations/razorpay";
+import { checkProjectAccess, initiatePayment, checkProjectPaymentStatus } from "@/integrations/razorpay";
 import { toast } from "sonner";
 import ProjectImageCarousel from "@/components/portfolio/ProjectImageCarousel";
 
@@ -12,23 +12,28 @@ export default function ClientProjectsCatalog() {
   const { projects, isLoading: projectsLoading } = useProjects();
   const { user } = useAuth();
   const [projectAccess, setProjectAccess] = useState<Record<string, any>>({});
+  const [projectPaymentStatus, setProjectPaymentStatus] = useState<Record<string, any>>({});
   const [loadingPayment, setLoadingPayment] = useState<string | null>(null);
 
-  // Check access for all projects when user changes
+  // Check access and payment status for all projects when user changes
   useEffect(() => {
-    const fetchAccess = async () => {
+    const fetchAccessAndPaymentStatus = async () => {
       if (!user) return;
       
       const accessMap: Record<string, any> = {};
+      const paymentStatusMap: Record<string, any> = {};
       for (const project of projects) {
         const access = await checkProjectAccess(user.id, project.id);
+        const paymentStatus = await checkProjectPaymentStatus(user.id, project.id);
         accessMap[project.id] = access;
+        paymentStatusMap[project.id] = paymentStatus;
       }
       setProjectAccess(accessMap);
+      setProjectPaymentStatus(paymentStatusMap);
     };
 
     if (projects.length > 0) {
-      fetchAccess();
+      fetchAccessAndPaymentStatus();
     }
   }, [user, projects]);
 
@@ -191,8 +196,60 @@ export default function ClientProjectsCatalog() {
                     </div>
                   )}
 
-                  {/* Purchase Button */}
-                  {isPaid && !access?.hasAccess && (
+                  {/* Payment Pending Approval */}
+                  {isPaid && !access?.hasAccess && projectPaymentStatus[project.id]?.hasPaid && projectPaymentStatus[project.id]?.status !== "approved" && projectPaymentStatus[project.id]?.status !== "rejected" && (
+                    <Button disabled className="w-full bg-orange-500/20 text-orange-700 hover:bg-orange-500/20 text-sm font-semibold py-2.5 rounded-lg">
+                      <Clock className="w-4 h-4 mr-2" />
+                      Awaiting Admin Approval
+                    </Button>
+                  )}
+
+                  {/* Payment Rejected */}
+                  {isPaid && !access?.hasAccess && projectPaymentStatus[project.id]?.status === "rejected" && (
+                    <div className="w-full space-y-2">
+                      <Button disabled className="w-full bg-red-500/20 text-red-700 hover:bg-red-500/20 text-sm font-semibold py-2.5 rounded-lg">
+                        <AlertCircle className="w-4 h-4 mr-2" />
+                        Payment Rejected
+                      </Button>
+                      {projectPaymentStatus[project.id]?.rejectionReason && (
+                        <div className="p-2 rounded bg-red-50 border border-red-200">
+                          <p className="text-xs font-semibold text-red-800">Rejection Reason:</p>
+                          <p className="text-xs text-red-700 mt-1">{projectPaymentStatus[project.id]?.rejectionReason}</p>
+                        </div>
+                      )}
+                      <Button
+                        onClick={() => {
+                          if (!user) {
+                            toast.error("Please login to purchase projects");
+                            return;
+                          }
+                          setLoadingPayment(project.id);
+                          initiatePayment({
+                            projectId: project.id,
+                            projectTitle: project.title,
+                            price: price,
+                            userEmail: user.email || "",
+                            userName: user.user_metadata?.full_name || "User",
+                            userId: user.id,
+                          }).finally(() => setLoadingPayment(null));
+                        }}
+                        disabled={loadingPayment === project.id}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2.5 rounded-lg transition-all text-sm"
+                      >
+                        {loadingPayment === project.id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Try Again"
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Purchase Button - Only show if no payment made yet */}
+                  {isPaid && !access?.hasAccess && !projectPaymentStatus[project.id]?.hasPaid && (
                     <Button
                       onClick={() => {
                         if (!user) {

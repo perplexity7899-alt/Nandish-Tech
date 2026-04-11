@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FolderOpen, Wrench, MessageSquare, Eye, Package, Send } from "lucide-react";
+import { FolderOpen, Wrench, MessageSquare, Eye, Package, Send, CheckCircle, XCircle } from "lucide-react";
 
 export default function DashboardOverview() {
   const { data: projects = [] } = useQuery({
@@ -49,7 +49,21 @@ export default function DashboardOverview() {
     },
   });
 
+  // Fetch project purchases
+  const { data: purchases = [] } = useQuery({
+    queryKey: ["admin-purchases"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("project_purchases")
+        .select("*");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const unread = messages.filter((m) => !m.read).length;
+  const approvedPurchases = purchases.filter((p) => p.payment_status === "approved").length;
+  const rejectedPurchases = purchases.filter((p) => p.payment_status === "rejected").length;
 
   const stats = [
     { label: "Projects", value: projects.length, icon: FolderOpen, color: "text-primary" },
@@ -57,6 +71,8 @@ export default function DashboardOverview() {
     { label: "Messages", value: messages.length, icon: MessageSquare, color: "text-primary" },
     { label: "Unread", value: unread, icon: Eye, color: unread > 0 ? "text-destructive" : "text-primary" },
     { label: "Deliveries", value: deliveries.length, icon: Package, color: deliveries.length > 0 ? "text-accent" : "text-primary" },
+    { label: "Approved Purchases", value: approvedPurchases, icon: CheckCircle, color: "text-green-600" },
+    { label: "Rejected Purchases", value: rejectedPurchases, icon: XCircle, color: rejectedPurchases > 0 ? "text-destructive" : "text-primary" },
   ];
 
   return (

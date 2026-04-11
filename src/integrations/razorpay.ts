@@ -62,6 +62,9 @@ export const initiatePayment = async (options: PaymentOptions) => {
           currency: "INR",
           payment_status: "pending",
           payment_id: "temp_" + Date.now(),
+          client_name: userName,
+          client_email: userEmail,
+          project_title: projectTitle,
         })
         .select()
         .single();
@@ -159,7 +162,7 @@ export const checkProjectAccess = async (
     .select("*")
     .eq("user_id", userId)
     .eq("project_id", projectId)
-    .eq("payment_status", "completed")
+    .eq("payment_status", "approved")
     .single();
 
   if (error || !data) {
@@ -170,5 +173,33 @@ export const checkProjectAccess = async (
     hasAccess: true,
     codeAccess: data.code_access || false,
     liveAccess: data.live_access || false,
+  };
+};
+
+// Check if user has already made a payment for this project (pending or verified, not just approved)
+export const checkProjectPaymentStatus = async (
+  userId: string,
+  projectId: string
+): Promise<{
+  hasPaid: boolean;
+  status: "completed" | "verified" | "approved" | "rejected" | null;
+  rejectionReason?: string;
+}> => {
+  const { data, error } = await (supabase as any)
+    .from("project_purchases")
+    .select("payment_status, rejection_reason")
+    .eq("user_id", userId)
+    .eq("project_id", projectId)
+    .in("payment_status", ["completed", "verified", "approved", "rejected"])
+    .single();
+
+  if (error || !data) {
+    return { hasPaid: false, status: null };
+  }
+
+  return {
+    hasPaid: data.payment_status !== "rejected",
+    status: data.payment_status,
+    rejectionReason: data.rejection_reason || undefined,
   };
 };
