@@ -184,7 +184,7 @@ export default function AdminPurchasesManager() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pending" className="space-y-4 mt-6">
+        <TabsContent value="pending" className="space-y-4 mt-8 pt-4">
           {pendingPurchases.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">
@@ -275,7 +275,7 @@ export default function AdminPurchasesManager() {
           )}
         </TabsContent>
 
-        <TabsContent value="verified" className="space-y-4 mt-6">
+        <TabsContent value="verified" className="space-y-4 mt-8 pt-4">
           {verifiedPurchases.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">
@@ -351,7 +351,7 @@ export default function AdminPurchasesManager() {
           )}
         </TabsContent>
 
-        <TabsContent value="approved" className="space-y-4 mt-6">
+        <TabsContent value="approved" className="space-y-4 mt-8 pt-4">
           {approvedPurchases.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">
@@ -362,25 +362,27 @@ export default function AdminPurchasesManager() {
             approvedPurchases.map((purchase) => (
               <Card key={purchase.id} className="border-green-200 bg-green-50/30">
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2 flex-1">
-                      <CardTitle className="text-lg">{purchase.project_title || "Project"}</CardTitle>
-                      <CardDescription className="flex items-center gap-2 flex-wrap">
-                        <span>{purchase.client_name || "Unknown User"}</span>
-                        {purchase.client_email && purchase.client_email !== "N/A" && (
-                          <a href={`mailto:${purchase.client_email}`} className="text-xs text-blue-600 hover:underline">
-                            {purchase.client_email}
-                          </a>
-                        )}
-                        {(!purchase.client_email || purchase.client_email === "N/A") && (
-                          <span className="text-xs text-muted-foreground">({purchase.user_id?.slice(0, 8)}...)</span>
-                        )}
-                      </CardDescription>
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-2 flex-1">
+                        <CardTitle className="text-lg">{purchase.project_title || "Project"}</CardTitle>
+                        <CardDescription className="flex items-center gap-2 flex-wrap">
+                          <span>{purchase.client_name || "Unknown User"}</span>
+                          {purchase.client_email && purchase.client_email !== "N/A" && (
+                            <a href={`mailto:${purchase.client_email}`} className="text-xs text-blue-600 hover:underline">
+                              {purchase.client_email}
+                            </a>
+                          )}
+                          {(!purchase.client_email || purchase.client_email === "N/A") && (
+                            <span className="text-xs text-muted-foreground">({purchase.user_id?.slice(0, 8)}...)</span>
+                          )}
+                        </CardDescription>
+                      </div>
+                      <Badge className={getStatusColor(purchase.payment_status)}>
+                        {getStatusIcon(purchase.payment_status)}
+                        <span className="ml-1 capitalize">{purchase.payment_status}</span>
+                      </Badge>
                     </div>
-                    <Badge className={getStatusColor(purchase.payment_status)}>
-                      {getStatusIcon(purchase.payment_status)}
-                      <span className="ml-1 capitalize">{purchase.payment_status}</span>
-                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -404,7 +406,7 @@ export default function AdminPurchasesManager() {
           )}
         </TabsContent>
 
-        <TabsContent value="rejected" className="space-y-4 mt-6">
+        <TabsContent value="rejected" className="space-y-4 mt-8 pt-4">
           {rejectedPurchases.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">

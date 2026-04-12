@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { checkProjectAccess, initiatePayment, checkProjectPaymentStatus } from "@/integrations/razorpay";
 import { toast } from "sonner";
 import ProjectImageCarousel from "@/components/portfolio/ProjectImageCarousel";
+import PaymentOptionsDialog from "./PaymentOptionsDialog";
 
 export default function ClientProjectsCatalog() {
   const { projects, isLoading: projectsLoading } = useProjects();
@@ -14,6 +15,8 @@ export default function ClientProjectsCatalog() {
   const [projectAccess, setProjectAccess] = useState<Record<string, any>>({});
   const [projectPaymentStatus, setProjectPaymentStatus] = useState<Record<string, any>>({});
   const [loadingPayment, setLoadingPayment] = useState<string | null>(null);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [selectedProjectForPayment, setSelectedProjectForPayment] = useState<any>(null);
 
   // Check access and payment status for all projects when user changes
   useEffect(() => {
@@ -256,15 +259,8 @@ export default function ClientProjectsCatalog() {
                           toast.error("Please login to purchase projects");
                           return;
                         }
-                        setLoadingPayment(project.id);
-                        initiatePayment({
-                          projectId: project.id,
-                          projectTitle: project.title,
-                          price: price,
-                          userEmail: user.email || "",
-                          userName: user.user_metadata?.full_name || "User",
-                          userId: user.id,
-                        }).finally(() => setLoadingPayment(null));
+                        setSelectedProjectForPayment(project);
+                        setPaymentDialogOpen(true);
                       }}
                       disabled={loadingPayment === project.id}
                       className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-2.5 rounded-lg transition-all hover:shadow-lg text-sm"
@@ -285,6 +281,34 @@ export default function ClientProjectsCatalog() {
           );
         })}
       </div>
+
+      {/* Payment Options Dialog */}
+      {selectedProjectForPayment && (
+        <PaymentOptionsDialog
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          projectTitle={selectedProjectForPayment.title}
+          price={selectedProjectForPayment.pricing?.price || 0}
+          onRazorpayClick={() => {
+            if (!user) {
+              toast.error("Please login to purchase projects");
+              return;
+            }
+            setLoadingPayment(selectedProjectForPayment.id);
+            initiatePayment({
+              projectId: selectedProjectForPayment.id,
+              projectTitle: selectedProjectForPayment.title,
+              price: selectedProjectForPayment.pricing?.price || 0,
+              userEmail: user.email || "",
+              userName: user.user_metadata?.full_name || "User",
+              userId: user.id,
+            })
+              .finally(() => setLoadingPayment(null));
+          }}
+          isProcessing={loadingPayment === selectedProjectForPayment.id}
+          upiId="nandishgs1@ybl"
+        />
+      )}
     </div>
   );
 }

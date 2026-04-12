@@ -175,7 +175,7 @@ export default function ClientsManager() {
                 {clients.map((client) => (
                   <div
                     key={client.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-4"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
@@ -201,16 +201,14 @@ export default function ClientsManager() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          Joined: {formatDate(client.created_at)}
-                        </p>
-                        <Badge variant="outline" className="mt-2">
-                          No Purchase
-                        </Badge>
-                      </div>
+                    <div className="flex flex-col sm:items-end items-start gap-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        Joined: {formatDate(client.created_at)}
+                      </p>
+                      <Badge variant="outline" className="w-fit sm:w-auto">
+                        No Purchase
+                      </Badge>
                     </div>
                   </div>
                 ))}
@@ -232,7 +230,7 @@ export default function ClientsManager() {
                 {allClients.map((client) => (
                   <div
                     key={client.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-4"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
@@ -258,16 +256,14 @@ export default function ClientsManager() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          Joined: {formatDate(client.created_at)}
-                        </p>
-                        <Badge variant="outline" className="mt-2 bg-yellow-50">
-                          Only Registered
-                        </Badge>
-                      </div>
+                    <div className="flex flex-col sm:items-end items-start gap-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        Joined: {formatDate(client.created_at)}
+                      </p>
+                      <Badge variant="outline" className="bg-yellow-50 w-fit sm:w-auto">
+                        Only Registered
+                      </Badge>
                     </div>
                   </div>
                 ))}
@@ -289,7 +285,7 @@ export default function ClientsManager() {
                 {purchasedClients.map((client) => (
                   <div
                     key={client.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors bg-primary/5"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors bg-primary/5 gap-4"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
@@ -315,17 +311,15 @@ export default function ClientsManager() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          Joined: {formatDate(client.created_at)}
-                        </p>
-                        <Badge className="mt-2 bg-primary">
-                          <ShoppingCart className="w-3 h-3 mr-1" />
-                          Purchased
-                        </Badge>
-                      </div>
+                    <div className="flex flex-col sm:items-end items-start gap-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        Joined: {formatDate(client.created_at)}
+                      </p>
+                      <Badge className="bg-primary w-fit sm:w-auto">
+                        <ShoppingCart className="w-3 h-3 mr-1" />
+                        Purchased
+                      </Badge>
                     </div>
                   </div>
                 ))}
