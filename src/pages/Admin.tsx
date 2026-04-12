@@ -14,6 +14,7 @@ import ServicesManager from "@/components/admin/ServicesManager";
 import MessagesPanel from "@/components/admin/MessagesPanel";
 import PricingManager from "@/components/admin/PricingManager";
 import AdminPurchasesManager from "@/components/admin/AdminPurchasesManager";
+import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -94,6 +95,7 @@ export default function Admin() {
     services: <ServicesManager />,
     messages: <MessagesPanel />,
     pricing: <PricingManager />,
+    payments: <PaymentSettingsManager />,
   };
 
   return (

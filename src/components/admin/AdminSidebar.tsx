@@ -1,7 +1,7 @@
-import { LayoutDashboard, FolderOpen, User, Wrench, MessageSquare, LogOut, ArrowLeft, Send, Menu, X, DollarSign, Users } from "lucide-react";
+import { LayoutDashboard, FolderOpen, User, Wrench, MessageSquare, LogOut, ArrowLeft, Send, Menu, X, DollarSign, Users, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "messages" | "pricing" | "clients";
+export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "messages" | "pricing" | "clients" | "payments";
 
 interface Props {
   active: AdminTab;
@@ -18,6 +18,7 @@ const items: { id: AdminTab; label: string; icon: React.ComponentType<{ classNam
   { id: "projects", label: "Projects", icon: FolderOpen },
   { id: "deliver", label: "Deliver", icon: Send },
   { id: "purchases", label: "Purchases", icon: DollarSign },
+  { id: "payments", label: "Payment Settings", icon: CreditCard },
   { id: "about", label: "About", icon: User },
   { id: "services", label: "Services", icon: Wrench },
   { id: "pricing", label: "Pricing", icon: DollarSign },

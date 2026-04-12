@@ -53,23 +53,22 @@ export const initiatePayment = async (options: PaymentOptions) => {
     let purchase = existingPurchase;
     
     if (!purchase) {
-      const { data: newPurchase, error: purchaseError } = await (supabase as any)
-        .from("project_purchases")
-        .insert({
-          user_id: userId,
-          project_id: projectId,
-          price,
-          currency: "INR",
-          payment_status: "pending",
-          payment_id: "temp_" + Date.now(),
-          client_name: userName,
-          client_email: userEmail,
-          project_title: projectTitle,
-        })
-        .select()
-        .single();
-
-      if (purchaseError) {
+    const { data: newPurchase, error: purchaseError } = await (supabase as any)
+      .from("project_purchases")
+      .insert({
+        user_id: userId,
+        project_id: projectId,
+        price,
+        currency: "INR",
+        payment_status: "pending",
+        payment_id: "temp_" + Date.now(),
+        client_name: (window as any).clientPaymentInfo?.name || userName,
+        client_email: (window as any).clientPaymentInfo?.email || userEmail,
+        client_phone: (window as any).clientPaymentInfo?.phone || null,
+        project_title: projectTitle,
+      })
+      .select()
+      .single();      if (purchaseError) {
         console.error("❌ Purchase creation error:", {
           code: purchaseError.code,
           message: purchaseError.message,
@@ -86,6 +85,7 @@ export const initiatePayment = async (options: PaymentOptions) => {
     console.log("💳 Razorpay Key:", import.meta.env.VITE_RAZORPAY_KEY_ID);
 
     // Razorpay payment options
+    const clientInfo = (window as any).clientPaymentInfo;
     const razorpayOptions: any = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_YOUR_KEY",
       amount: Math.round(price * 100), // Amount in paise (ensure it's an integer)
@@ -93,20 +93,33 @@ export const initiatePayment = async (options: PaymentOptions) => {
       name: "Nandish-Tech",
       description: `Purchase: ${projectTitle}`,
       prefill: {
-        name: userName,
-        email: userEmail,
+        name: clientInfo?.name || userName,
+        email: clientInfo?.email || userEmail,
+        contact: clientInfo?.phone || "",
       },
       handler: async (response: any) => {
         const { razorpay_payment_id } = response;
         console.log("✅ Payment successful:", razorpay_payment_id);
+
+        // Fetch the project pricing to see what access types are available
+        const { data: projectPricing, error: pricingError } = await (supabase as any)
+          .from("projects_pricing")
+          .select("code_access, live_access")
+          .eq("project_id", projectId)
+          .single();
+
+        // Default: if pricing not found, grant code access only
+        const codeAccess = projectPricing?.code_access || true;
+        const liveAccess = projectPricing?.live_access || false;
 
         const { error: updateError } = await (supabase as any)
           .from("project_purchases")
           .update({
             payment_id: razorpay_payment_id,
             payment_status: "completed",
-            code_access: true,
-            live_access: true,
+            payment_method: "razorpay",
+            code_access: codeAccess,
+            live_access: liveAccess,
           })
           .eq("id", purchase.id);
 

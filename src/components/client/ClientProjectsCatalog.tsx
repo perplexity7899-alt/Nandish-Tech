@@ -306,7 +306,11 @@ export default function ClientProjectsCatalog() {
               .finally(() => setLoadingPayment(null));
           }}
           isProcessing={loadingPayment === selectedProjectForPayment.id}
-          upiId="nandishgs1@ybl"
+          upiId="nandishgs1@ibl"
+          userId={user?.id}
+          projectId={selectedProjectForPayment.id}
+          userName={user?.user_metadata?.full_name || "User"}
+          userEmail={user?.email}
         />
       )}
     </div>
