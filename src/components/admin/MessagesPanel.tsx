@@ -277,6 +277,23 @@ export default function MessagesPanel() {
       setReplyText("");
       setReplyingToId(null);
       
+      // Send broadcast notification to client
+      try {
+        const channel = supabase.channel("notifications");
+        await channel.send({
+          type: "broadcast",
+          event: "admin_reply_sent",
+          payload: {
+            message_id: messageId,
+            admin_id: user.data.user.id,
+            timestamp: new Date().toISOString(),
+          },
+        });
+        console.log("Broadcast notification sent to clients");
+      } catch (broadcastError) {
+        console.error("Error sending broadcast notification:", broadcastError);
+      }
+      
       // Immediately invalidate and refetch queries to update UI
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin-replies"] }),

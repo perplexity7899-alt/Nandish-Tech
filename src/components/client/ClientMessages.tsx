@@ -167,6 +167,42 @@ export default function ClientMessages() {
     };
   }, [user?.id, messages, queryClient]);
 
+  // Listen for broadcast notifications from admin
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let channel: any;
+    try {
+      console.log("Setting up broadcast listener for admin notifications...");
+      
+      channel = supabase
+        .channel("notifications")
+        .on("broadcast", { event: "admin_reply_sent" }, (payload: any) => {
+          console.log("Broadcast notification received:", payload);
+          
+          // Play notification sound for admin reply
+          if (payload.payload && payload.payload.message_id) {
+            console.log("Admin sent a reply, playing notification sound...");
+            playNotificationSound("admin_reply");
+            
+            // Refetch replies to show the new message
+            queryClient.invalidateQueries({ queryKey: ["client-replies"] });
+          }
+        })
+        .subscribe((status: string) => {
+          console.log("Broadcast subscription status:", status);
+        });
+    } catch (error) {
+      console.error("Error subscribing to broadcast notifications:", error);
+    }
+
+    return () => {
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
+  }, [user?.id, queryClient]);
+
   const sendReply = async (messageId: string) => {
     if (!replyText.trim()) {
       toast.error("Reply cannot be empty");
