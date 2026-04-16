@@ -387,7 +387,7 @@ export default function MessagesPanel() {
                         </div>
                       </div>
                       <div className="mb-3 p-3 bg-muted/50 rounded-lg border border-muted">
-                        <p className="text-xs text-muted-foreground mb-1">Client Message</p>
+                        <p className="text-xs text-foreground font-semibold mb-1">👤 Client Message</p>
                         <p className="text-sm text-foreground font-medium">{msg.message}</p>
                       </div>
 
@@ -403,10 +403,8 @@ export default function MessagesPanel() {
                                   // Admin Reply
                                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground">
-                                        <span className="text-xs font-bold">A</span>
-                                      </div>
-                                      <p className="text-xs font-medium text-primary">Admin Reply</p>
+                                      <span className="text-lg">👨‍💼</span>
+                                      <p className="text-xs font-semibold text-foreground">Admin Reply</p>
                                       <span className="text-xs text-muted-foreground ml-auto">
                                         {new Date(reply.created_at).toLocaleString()}
                                       </span>
@@ -417,10 +415,7 @@ export default function MessagesPanel() {
                                   // Client Reply
                                   <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-accent">
-                                        <span className="text-xs font-bold text-white">C</span>
-                                      </div>
-                                      <p className="text-xs font-medium text-accent">Client Reply</p>
+                                      <p className="text-xs font-semibold text-foreground">👤 Client Reply</p>
                                       <span className="text-xs text-muted-foreground ml-auto">
                                         {new Date(reply.created_at).toLocaleString()}
                                       </span>
