@@ -386,23 +386,48 @@ export default function MessagesPanel() {
                           )}
                         </div>
                       </div>
-                      <div className="mb-2">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Project Topic:</p>
+                      <div className="mb-3 p-3 bg-muted/50 rounded-lg border border-muted">
+                        <p className="text-xs text-muted-foreground mb-1">Client Message</p>
                         <p className="text-sm text-foreground font-medium">{msg.message}</p>
                       </div>
 
                       {/* Show replies for this message */}
                       {replies.filter((r) => r.message_id === msg.id).length > 0 && (
-                        <div className="mt-3 ml-3 pl-3 border-l-2 border-primary/30 space-y-2">
+                        <div className="space-y-2 ml-4 border-l-2 border-primary/30 pl-4">
                           {replies
                             .filter((r) => r.message_id === msg.id)
+                            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
                             .map((reply) => (
-                              <div key={reply.id} className="text-xs">
-                                <p className="font-medium text-primary mb-1">You replied:</p>
-                                <p className="text-foreground/80">{reply.reply_message}</p>
-                                <p className="text-muted-foreground text-xs mt-1">
-                                  {new Date(reply.created_at).toLocaleString()}
-                                </p>
+                              <div key={reply.id}>
+                                {reply.admin_id && !reply.client_id ? (
+                                  // Admin Reply
+                                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground">
+                                        <span className="text-xs font-bold">A</span>
+                                      </div>
+                                      <p className="text-xs font-medium text-primary">Admin Reply</p>
+                                      <span className="text-xs text-muted-foreground ml-auto">
+                                        {new Date(reply.created_at).toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-foreground">{reply.reply_message}</p>
+                                  </div>
+                                ) : reply.client_id && !reply.admin_id ? (
+                                  // Client Reply
+                                  <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-accent">
+                                        <span className="text-xs font-bold text-white">C</span>
+                                      </div>
+                                      <p className="text-xs font-medium text-accent">Client Reply</p>
+                                      <span className="text-xs text-muted-foreground ml-auto">
+                                        {new Date(reply.created_at).toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-foreground">{reply.reply_message}</p>
+                                  </div>
+                                ) : null}
                               </div>
                             ))}
                         </div>
