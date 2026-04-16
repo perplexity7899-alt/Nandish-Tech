@@ -1,5 +1,6 @@
 import { LayoutDashboard, FolderOpen, User, Wrench, MessageSquare, LogOut, ArrowLeft, Send, Menu, X, DollarSign, Users, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "./NotificationBell";
 
 export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "messages" | "pricing" | "clients" | "payments";
 
@@ -45,12 +46,15 @@ export default function AdminSidebar({ active, onChange, onLogout, unreadCount, 
           : "hidden md:flex transition-transform duration-300"
       }`}>
         <div className="p-6 border-b border-primary-foreground/10">
-          <h2 className="font-display text-lg font-bold flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xs">NT</span>
-            </div>
-            <span>Nandish-Tech</span>
-          </h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-display text-lg font-bold flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xs">NT</span>
+              </div>
+              <span>Nandish-Tech</span>
+            </h2>
+            <NotificationBell />
+          </div>
           <p className="text-xs mt-1">Admin Panel</p>
         </div>
 

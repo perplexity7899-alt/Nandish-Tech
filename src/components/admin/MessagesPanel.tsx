@@ -6,6 +6,7 @@ import { Mail, Trash2, Eye, ChevronDown, ChevronUp, Send, MessageSquare } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Reply } from "@/types/portfolio";
+import { playNotificationSound } from "@/utils/notifications";
 
 export default function MessagesPanel() {
   const queryClient = useQueryClient();
@@ -170,6 +171,47 @@ export default function MessagesPanel() {
     };
   }, [queryClient]);
 
+  // Listen for client reply notifications
+  useEffect(() => {
+    let channel: any;
+
+    try {
+      const user = supabase.auth.getUser();
+      
+      // Subscribe to admin-specific channel for new client replies
+      channel = supabase
+        .channel("admin-notifications")
+        .on(
+          "broadcast",
+          { event: "new_client_reply" },
+          (payload: any) => {
+            console.log("Client reply notification received:", payload);
+            // Play notification sound
+            playNotificationSound("reply");
+            // Show toast notification
+            toast.success(`${payload.payload.client_name} replied to your message!`, {
+              description: payload.payload.message,
+            });
+            // Refetch replies to show new reply
+            queryClient.invalidateQueries({ queryKey: ["admin-replies"] });
+          }
+        )
+        .subscribe((status: string) => {
+          if (status === "SUBSCRIBED") {
+            console.log("Admin notifications subscription active");
+          }
+        });
+    } catch (error) {
+      console.error("Error subscribing to admin notifications:", error);
+    }
+
+    return () => {
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
+  }, [queryClient]);
+
   const deleteConversation = async (userId: string) => {
     const { error } = await supabase.from("messages").delete().eq("user_id", userId);
     if (error) {
@@ -220,6 +262,7 @@ export default function MessagesPanel() {
           message_id: messageId,
           admin_id: user.data.user.id,
           reply_message: replyText.trim(),
+          is_admin_reply: true,
         })
         .select();
 

@@ -66,10 +66,12 @@ export interface ContactMessage {
 export interface Reply {
   id: string;
   message_id: string;
-  admin_id: string;
+  admin_id?: string;
+  client_id?: string;
   reply_message: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  is_admin_reply?: boolean;
 }
 
 export interface SocialLink {
