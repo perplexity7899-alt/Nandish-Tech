@@ -6,7 +6,7 @@ import { Mail, Trash2, Eye, ChevronDown, ChevronUp, Send, MessageSquare } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Reply } from "@/types/portfolio";
-import { playNotificationSound } from "@/utils/notifications";
+import { playNotificationSound, sendRealtimeNotification } from "@/utils/notifications";
 
 export default function MessagesPanel() {
   const queryClient = useQueryClient();
@@ -178,9 +178,9 @@ export default function MessagesPanel() {
     try {
       const user = supabase.auth.getUser();
       
-      // Subscribe to admin-specific channel for new client replies
+      // Subscribe to notifications channel for new client replies
       channel = supabase
-        .channel("admin-notifications")
+        .channel("notifications")
         .on(
           "broadcast",
           { event: "new_client_reply" },
@@ -198,11 +198,11 @@ export default function MessagesPanel() {
         )
         .subscribe((status: string) => {
           if (status === "SUBSCRIBED") {
-            console.log("Admin notifications subscription active");
+            console.log("Client notifications subscription active");
           }
         });
     } catch (error) {
-      console.error("Error subscribing to admin notifications:", error);
+      console.error("Error subscribing to client notifications:", error);
     }
 
     return () => {
@@ -250,6 +250,13 @@ export default function MessagesPanel() {
         return;
       }
 
+      // Get the message to find client info
+      const { data: messageData } = await (supabase as any)
+        .from("messages")
+        .select("*")
+        .eq("id", messageId)
+        .single();
+
       console.log("Sending reply:", {
         message_id: messageId,
         admin_id: user.data.user.id,
@@ -277,7 +284,7 @@ export default function MessagesPanel() {
       setReplyText("");
       setReplyingToId(null);
       
-      // Send broadcast notification to client
+      // Send broadcast notification to client (real-time)
       try {
         const channel = supabase.channel("notifications");
         await channel.send({
@@ -293,6 +300,12 @@ export default function MessagesPanel() {
       } catch (broadcastError) {
         console.error("Error sending broadcast notification:", broadcastError);
       }
+
+      // NOTE: Client notifications are currently real-time only (broadcast + toast)
+      // The notifications table is designed for admin notifications primarily
+      // To fully implement hybrid approach, we'd need:
+      // 1. A client_notifications table (separate from admin notifications)
+      // 2. Or extend notifications table to support both client_id and admin_id
       
       // Immediately invalidate and refetch queries to update UI
       await Promise.all([

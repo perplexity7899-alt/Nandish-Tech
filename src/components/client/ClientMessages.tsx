@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { sendAdminNotification } from "@/utils/notifications";
 
 interface Message {
   id: string;
@@ -232,6 +233,21 @@ export default function ClientMessages() {
 
       // Play notification sound
       playNotificationSound("reply");
+
+      // Send broadcast notification to admin (real-time only)
+      try {
+        await sendAdminNotification(
+          supabase,
+          user?.user_metadata?.full_name || user?.email || "Client",
+          replyText.trim(),
+          messageId,
+          user?.id || ""
+        );
+        console.log("Admin notification sent");
+      } catch (notificationError) {
+        console.error("Error sending admin notification:", notificationError);
+        // Don't throw - the reply was already sent successfully
+      }
 
       // Refetch replies
       await queryClient.refetchQueries({ queryKey: ["client-replies"] });

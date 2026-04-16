@@ -49,7 +49,7 @@ export const playNotificationSound = (type: 'message' | 'reply' | 'admin_reply' 
   }
 };
 
-// Send notification to admin via Supabase real-time
+// Send notification to admin via Supabase real-time and database (hybrid approach)
 export const sendRealtimeNotification = async (
   supabase: any,
   adminId: string,
@@ -58,7 +58,7 @@ export const sendRealtimeNotification = async (
   type: 'client_reply' | 'new_message' = 'client_reply'
 ) => {
   try {
-    // Send notification via Supabase
+    // Send notification via Supabase database for persistence
     const { data, error } = await supabase
       .from('notifications')
       .insert({
@@ -74,10 +74,60 @@ export const sendRealtimeNotification = async (
 
     if (error) {
       console.error('Error sending notification:', error);
+      return null;
+    }
+
+    // Also send a broadcast for real-time delivery
+    try {
+      const channel = supabase.channel('admin-notifications-' + adminId);
+      await channel.send({
+        type: 'broadcast',
+        event: type === 'client_reply' ? 'new_client_reply' : 'new_message',
+        payload: {
+          notification_id: data?.[0]?.id,
+          admin_id: adminId,
+          client_name: clientName,
+          type,
+          message: data?.[0]?.message,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      console.log('Real-time notification broadcast sent');
+    } catch (broadcastError) {
+      console.error('Error sending broadcast notification:', broadcastError);
+      // Don't fail - database notification was saved
     }
 
     return data;
   } catch (error) {
     console.error('Error in sendRealtimeNotification:', error);
+    return null;
+  }
+};
+
+// Send notification for admin when client sends a reply (no DB persistence, just broadcast)
+export const sendAdminNotification = async (
+  supabase: any,
+  clientName: string,
+  replyText: string,
+  messageId: string,
+  clientId: string
+) => {
+  try {
+    const channel = supabase.channel('notifications');
+    await channel.send({
+      type: 'broadcast',
+      event: 'new_client_reply',
+      payload: {
+        message_id: messageId,
+        client_id: clientId,
+        client_name: clientName,
+        message: replyText,
+        timestamp: new Date().toISOString(),
+      },
+    });
+    console.log('Admin notification broadcast sent');
+  } catch (error) {
+    console.error('Error sending admin notification:', error);
   }
 };
