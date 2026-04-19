@@ -4,6 +4,7 @@ import { X, CheckCircle, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { submitServiceInquiryResponse } from "@/utils/formspreeSubmit";
 
 interface ServiceContactFormProps {
   isOpen: boolean;
@@ -109,42 +110,35 @@ export default function ServiceContactForm({
         throw dbError;
       }
 
-      // Try to send email notification (optional - won't fail form if email fails)
+      // Try to send email notification via Formspree (optional - won't fail form if email fails)
       try {
-        // Email to admin
-        await fetch("/api/send-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: "admin@nandish-tech.com",
-            subject: `New Custom Project Inquiry - ${formData.serviceTitle}`,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.mobileNumber,
-            service: formData.serviceTitle,
-            timeline: formData.deliveryTimeline,
-            message: formData.message,
-            type: "custom-project-inquiry",
-          }),
+        // Send service inquiry email to admin
+        await submitServiceInquiryResponse({
+          adminName: "Nandish-Tech Team",
+          serviceType: formData.serviceTitle,
+          responseSubject: `New Service Inquiry - ${formData.serviceTitle}`,
+          responseMessage: `
+New Service Inquiry Submission:
+
+Client Name: ${formData.name}
+Client Email: ${formData.email}
+Client Phone: ${formData.mobileNumber}
+
+Service: ${formData.serviceTitle}
+Delivery Timeline: ${formData.deliveryTimeline}
+
+Project Details:
+${formData.message || "No additional details provided"}
+
+---
+Please reply to: ${formData.email}
+          `,
+          clientEmail: formData.email,
+          timeline: formData.deliveryTimeline,
+          priority: "normal",
         }).catch(() => {
           // Email sending failed but that's okay
           console.log("Email notification skipped");
-        });
-
-        // Send confirmation email to user
-        await fetch("/api/send-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: formData.email,
-            subject: "We Received Your Custom Project Inquiry - Nandish-Tech",
-            name: formData.name,
-            serviceTitle: formData.serviceTitle,
-            type: "inquiry-confirmation",
-          }),
-        }).catch(() => {
-          // Email sending failed but that's okay
-          console.log("Confirmation email skipped");
         });
       } catch (emailError) {
         console.log("Email notification error (non-critical):", emailError);

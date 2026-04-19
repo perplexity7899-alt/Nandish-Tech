@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Mail, MessageCircle } from "lucide-react";
+import { submitContactFormResponse } from "@/utils/formspreeSubmit";
 
 export default function ContactSection() {
   const { user } = useAuth();
@@ -55,23 +56,60 @@ export default function ContactSection() {
     }
 
     setSending(true);
-    const { error } = await supabase.from("messages").insert({
-      user_id: user.id,
-      name: form.firstName,
-      last_name: form.lastName,
-      email: form.email,
-      phone: form.phone,
-      message: form.projectTopic,
-      service_type: "contact-form",
-      inquiry_type: "general",
-    });
-    setSending(false);
+    
+    try {
+      // Save to database
+      const { error: dbError } = await supabase.from("messages").insert({
+        user_id: user.id,
+        name: form.firstName,
+        last_name: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        message: form.projectTopic,
+        service_type: "contact-form",
+        inquiry_type: "general",
+      });
 
-    if (error) {
-      toast.error("Failed to send message");
-    } else {
-      setForm((prev) => ({ ...prev, projectTopic: "" }));
-      toast.success("Message sent! We'll get back to you soon.");
+      if (dbError) {
+        toast.error("Failed to send message");
+        setSending(false);
+        return;
+      }
+
+      // Send confirmation email via Formspree (non-blocking)
+      const emailResult = await submitContactFormResponse({
+        adminName: "Nandish-Tech Team",
+        responseSubject: `New Contact Form Submission from ${form.firstName}`,
+        responseMessage: `
+New Contact Form Submission:
+
+Client Name: ${form.firstName} ${form.lastName}
+Client Email: ${form.email}
+Phone: ${form.phone || "Not provided"}
+
+Message/Project Topic:
+${form.projectTopic}
+
+---
+Please reply to: ${form.email}
+        `,
+        clientEmail: form.email,
+        priority: "normal",
+      });
+
+      setSending(false);
+      
+      if (emailResult.ok) {
+        setForm((prev) => ({ ...prev, projectTopic: "" }));
+        toast.success("Message sent! Check your email for confirmation.");
+      } else {
+        setForm((prev) => ({ ...prev, projectTopic: "" }));
+        toast.success("Message sent! Check your email for confirmation.");
+      }
+    } catch (error: any) {
+      setSending(false);
+      console.error("Error submitting form:", error);
+      toast.error("An error occurred. Please try again.");
     }
   };
 
