@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { LayoutDashboard, MessageSquare, User, LogOut, ArrowLeft, Mail, MessageCircle, FolderOpen, ShoppingCart, Menu, X } from "lucide-react";
+import { LayoutDashboard, MessageSquare, User, LogOut, ArrowLeft, Mail, MessageCircle, FolderOpen, ShoppingCart, Menu, X, Inbox } from "lucide-react";
 import ClientProfile from "@/components/client/ClientProfile";
 import ClientOverview from "@/components/client/ClientOverview";
 import ClientProjects from "@/components/client/ClientProjects";
 import ClientProjectsCatalog from "@/components/client/ClientProjectsCatalog";
 import ClientMessages from "@/components/client/ClientMessages";
+import ClientMailDisplay from "@/components/client/ClientMailDisplay";
 import ContactSection from "@/components/portfolio/ContactSection";
 
-type ClientTab = "dashboard" | "conversations" | "profile" | "projects" | "catalog" | "contact";
+type ClientTab = "dashboard" | "conversations" | "admin-messages" | "profile" | "projects" | "catalog" | "contact";
 
 const items: { id: ClientTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "projects", label: "My Deliveries", icon: FolderOpen },
   { id: "catalog", label: "All Projects", icon: ShoppingCart },
+  { id: "admin-messages", label: "Admin Messages", icon: Mail },
   { id: "conversations", label: "My Messages", icon: MessageSquare },
   { id: "profile", label: "Profile", icon: User },
   { id: "contact", label: "Contact", icon: Mail },
@@ -64,6 +66,7 @@ export default function ClientDashboard() {
     dashboard: <ClientOverview />,
     projects: <ClientProjects />,
     catalog: <ClientProjectsCatalog />,
+    "admin-messages": <ClientMailDisplay />,
     conversations: <ClientMessages />,
     profile: <ClientProfile />,
     contact: <ContactSection />,

@@ -12,6 +12,7 @@ import Login from "./pages/Login.tsx";
 import Register from "./pages/Register.tsx";
 import ClientDashboard from "./pages/ClientDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import PortfolioPage from "@/components/portfolio/PortfolioPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route

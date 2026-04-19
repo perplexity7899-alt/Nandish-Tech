@@ -15,6 +15,8 @@ import MessagesPanel from "@/components/admin/MessagesPanel";
 import PricingManager from "@/components/admin/PricingManager";
 import AdminPurchasesManager from "@/components/admin/AdminPurchasesManager";
 import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
+import CustomProjectReplies from "@/components/admin/CustomProjectReplies";
+import AdminMailManager from "@/components/admin/AdminMailManager";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -96,6 +98,8 @@ export default function Admin() {
     messages: <MessagesPanel />,
     pricing: <PricingManager />,
     payments: <PaymentSettingsManager />,
+    "custom-replies": <CustomProjectReplies />,
+    "admin-mail": <AdminMailManager />,
   };
 
   return (

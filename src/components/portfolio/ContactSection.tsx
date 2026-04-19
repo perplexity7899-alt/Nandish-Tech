@@ -62,6 +62,8 @@ export default function ContactSection() {
       email: form.email,
       phone: form.phone,
       message: form.projectTopic,
+      service_type: "contact-form",
+      inquiry_type: "general",
     });
     setSending(false);
 
