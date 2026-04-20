@@ -142,7 +142,7 @@ Please reply to: ${form.email}
               <a href="mailto:contactnandishtech@gmail.com" className="text-primary font-semibold text-base block mb-6">
                 contactnandishtech@gmail.com
               </a>
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contactnandishtech@gmail.com" target="_blank" rel="noopener noreferrer" className="w-full">
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contactnandishtech@gmail.com&su=Project%20Inquiry&body=Hello%20Nandish%2C%0A%0AI%20am%20interested%20in%20discussing%20my%20project%20requirements.%0A%0AProject%20Details%3A%0A%0AThank%20you" target="_blank" rel="noopener noreferrer" className="w-full">
                 <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
                   Send Email
                 </Button>
