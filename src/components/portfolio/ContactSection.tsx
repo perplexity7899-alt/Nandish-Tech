@@ -139,10 +139,10 @@ Please reply to: ${form.email}
                   <p className="text-sm text-muted-foreground">We'll respond within 24 hours</p>
                 </div>
               </div>
-              <a href="mailto:contact@nandish-tech.com" className="text-primary font-semibold text-base block mb-6">
-                contact@nandish-tech.com
+              <a href="mailto:contactnandishtech@gmail.com" className="text-primary font-semibold text-base block mb-6">
+                contactnandishtech@gmail.com
               </a>
-              <a href="mailto:contact@nandish-tech.com" className="w-full">
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contactnandishtech@gmail.com" target="_blank" rel="noopener noreferrer" className="w-full">
                 <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
                   Send Email
                 </Button>

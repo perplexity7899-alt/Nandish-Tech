@@ -2,7 +2,7 @@ import { LayoutDashboard, FolderOpen, User, Wrench, MessageSquare, LogOut, Arrow
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "./NotificationBell";
 
-export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "messages" | "pricing" | "clients" | "payments" | "custom-replies" | "admin-mail";
+export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "serviceoffers" | "messages" | "pricing" | "clients" | "payments" | "custom-replies" | "admin-mail";
 
 interface Props {
   active: AdminTab;
@@ -24,6 +24,7 @@ const items: { id: AdminTab; label: string; icon: React.ComponentType<{ classNam
   { id: "payments", label: "Payment Settings", icon: CreditCard },
   { id: "about", label: "About", icon: User },
   { id: "services", label: "Services", icon: Wrench },
+  { id: "serviceoffers", label: "Services I Offer", icon: DollarSign },
   { id: "pricing", label: "Pricing", icon: DollarSign },
   { id: "messages", label: "Messages", icon: MessageSquare },
 ];

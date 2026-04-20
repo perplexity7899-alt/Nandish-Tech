@@ -69,7 +69,7 @@ export default function Footer() {
               })}
             </div>
             <p className="text-sm text-primary-foreground/70">
-              <a href="mailto:contact@nandish-tech.com" className="hover:text-primary-foreground transition-colors">contact@nandish-tech.com</a>
+              <a href="mailto:contactnandishtech@gmail.com" className="hover:text-primary-foreground transition-colors">contactnandishtech@gmail.com</a>
             </p>
           </div>
         </div>

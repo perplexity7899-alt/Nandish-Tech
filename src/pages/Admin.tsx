@@ -11,6 +11,7 @@ import ProjectsManager from "@/components/admin/ProjectsManager";
 import DeliverProjects from "@/components/admin/DeliverProjects";
 import AboutManager from "@/components/admin/AboutManager";
 import ServicesManager from "@/components/admin/ServicesManager";
+import ServiceOfferManager from "@/components/admin/ServiceOfferManager";
 import MessagesPanel from "@/components/admin/MessagesPanel";
 import PricingManager from "@/components/admin/PricingManager";
 import AdminPurchasesManager from "@/components/admin/AdminPurchasesManager";
@@ -95,6 +96,7 @@ export default function Admin() {
     purchases: <AdminPurchasesManager />,
     about: <AboutManager />,
     services: <ServicesManager />,
+    serviceoffers: <ServiceOfferManager />,
     messages: <MessagesPanel />,
     pricing: <PricingManager />,
     payments: <PaymentSettingsManager />,

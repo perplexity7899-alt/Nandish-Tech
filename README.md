@@ -363,3 +363,25 @@ For issues, feature requests, or questions:
 
 **Last Updated**: April 2026  
 **Status**: Active Development
+
+
+
+Code2        // The code/brackets icon
+Rocket       // The rocket icon
+Zap          // The lightning bolt icon
+
+
+
+Code         // Simple code icon
+Server       // Server icon
+Palette      // Design/palette icon
+Database     // Database icon
+Globe        // Globe/world icon
+Smartphone   // Mobile phone icon
+ShoppingCart  // Shopping cart icon
+Shield       // Security shield icon
+TrendingUp   // Trending up arrow icon
+Award        // Award/trophy icon
+Settings     // Settings/gear icon
+MessageSquare // Message/chat icon
+Mail         // Mail/envelope icon
