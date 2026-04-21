@@ -9,6 +9,8 @@ interface ClientReply {
   client_email: string;
   client_phone: string;
   service_type: string;
+  service_price?: string;
+  service_price_unit?: string;
   delivery_timeline: string;
   project_details: string;
   inquiry_type: string;
@@ -161,6 +163,14 @@ export default function CustomProjectReplies() {
                       {selectedReply.service_type.replace(/-/g, " ")}
                     </span>
                   </div>
+                  {selectedReply.service_price && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold text-primary">₹</span>
+                      <span>
+                        {selectedReply.service_price} {selectedReply.service_price_unit || ""}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 text-sm">
                     <Clock className="w-4 h-4 text-primary flex-shrink-0" />
                     <span>{selectedReply.delivery_timeline}</span>

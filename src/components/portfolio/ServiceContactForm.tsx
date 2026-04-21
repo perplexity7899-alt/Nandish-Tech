@@ -1,26 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X, CheckCircle, ArrowRight } from "lucide-react";
+import { X, CheckCircle, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { submitServiceInquiryResponse } from "@/utils/formspreeSubmit";
+import { submitServiceInquiryResponse, submitServiceAcknowledgmentToClient } from "@/utils/formspreeSubmit";
+
+interface ServiceData {
+  id: string;
+  title: string;
+  price: string;
+  price_unit: string;
+}
 
 interface ServiceContactFormProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedService?: string;
+  selectedService?: ServiceData | null;
 }
 
 export default function ServiceContactForm({
   isOpen,
   onClose,
-  selectedService = "",
+  selectedService = null,
 }: ServiceContactFormProps) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    serviceTitle: selectedService,
+    serviceTitle: selectedService?.title || "",
+    servicePrice: selectedService?.price || "",
+    servicePriceUnit: selectedService?.price_unit || "onwards",
     message: "",
     mobileNumber: "",
     deliveryTimeline: "1-week",
@@ -29,7 +38,43 @@ export default function ServiceContactForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const [services, setServices] = useState<ServiceData[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
   const navigate = useNavigate();
+
+  // Fetch services from database
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("servicesoffer")
+          .select("id, title, price, price_unit")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setServices(data || []);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        setServices([]);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  // Update form when selectedService changes
+  useEffect(() => {
+    if (selectedService) {
+      setFormData((prev) => ({
+        ...prev,
+        serviceTitle: selectedService.title || "",
+        servicePrice: selectedService.price || "",
+        servicePriceUnit: selectedService.price_unit || "onwards",
+      }));
+    }
+  }, [selectedService, isOpen]);
 
   const deliveryOptions = [
     { value: "1-week", label: "1 Week" },
@@ -37,14 +82,6 @@ export default function ServiceContactForm({
     { value: "15-days", label: "15 Days" },
     { value: "1-month", label: "1 Month" },
     { value: "custom", label: "Custom Timeline" },
-  ];
-
-  const services = [
-    "Website Development",
-    "Landing Pages",
-    "AI Chatbot Integration",
-    "Full Stack Development",
-    "Custom Project",
   ];
 
   const handleChange = (
@@ -99,6 +136,8 @@ export default function ServiceContactForm({
           client_email: formData.email,
           client_phone: formData.mobileNumber,
           service_type: formData.serviceTitle.toLowerCase().replace(/\s+/g, "-"),
+          service_price: formData.servicePrice,
+          service_price_unit: formData.servicePriceUnit,
           delivery_timeline: formData.deliveryTimeline,
           project_details: formData.message,
           inquiry_type: "service-inquiry",
@@ -145,6 +184,20 @@ Please reply to: ${formData.email}
         // Don't fail the form submission if email fails
       }
 
+      // Send acknowledgment email to client
+      try {
+        await submitServiceAcknowledgmentToClient({
+          clientEmail: formData.email,
+          clientName: formData.name,
+          serviceTitle: formData.serviceTitle,
+        }).catch(() => {
+          console.log("Client acknowledgment email skipped");
+        });
+      } catch (clientEmailError) {
+        console.log("Client email notification error (non-critical):", clientEmailError);
+        // Don't fail the form submission if email fails
+      }
+
       // Show success message
       toast.success(
         "Thank you! We'll contact you soon regarding your project."
@@ -158,7 +211,9 @@ Please reply to: ${formData.email}
       setFormData({
         name: "",
         email: "",
-        serviceTitle: selectedService,
+        serviceTitle: selectedService?.title || "",
+        servicePrice: selectedService?.price || "",
+        servicePriceUnit: selectedService?.price_unit || "onwards",
         message: "",
         mobileNumber: "",
         deliveryTimeline: "1-week",
@@ -196,8 +251,14 @@ Please reply to: ${formData.email}
               <h2 className="font-display text-2xl font-bold text-foreground">
                 Request Received! ✓
               </h2>
-              <p className="text-muted-foreground">
-                Thank you for submitting your project inquiry. Our team has received your request.
+              <p className="text-muted-foreground whitespace-pre-line">
+                Hi! Thanks for reaching out 😊
+                <br/>
+                Please share your requirements, timeline, and budget.
+                <br/>
+                I'll review and get back with the best solution.
+                <br/>
+                Looking forward to working with you!
               </p>
             </div>
 
@@ -268,16 +329,16 @@ Please reply to: ${formData.email}
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-background rounded-lg shadow-xl w-full max-w-2xl my-4 sm:my-8">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-background rounded-t-lg sm:rounded-lg shadow-xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-none flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border">
-          <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border bg-gradient-to-r from-primary/5 to-accent/5 sticky top-0 z-10">
+          <h2 className="font-display text-lg sm:text-2xl font-bold text-foreground">
             Get a Custom Quote
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
             aria-label="Close form"
           >
             <X className="w-5 h-5" />
@@ -285,10 +346,31 @@ Please reply to: ${formData.email}
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
+          {/* Service Display Card */}
+          {formData.serviceTitle && (
+            <div className="bg-gradient-to-br from-primary/15 to-accent/10 border-2 border-primary/30 rounded-xl p-4 sm:p-5 -mx-4 sm:mx-0 sm:rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold text-primary mb-1 uppercase tracking-wide">Selected Service</p>
+                  <p className="font-bold text-foreground text-lg sm:text-xl">{formData.serviceTitle}</p>
+                </div>
+                {formData.servicePrice && (
+                  <div className="bg-white dark:bg-foreground/5 rounded-lg p-3 sm:p-4 border border-primary/20 sm:text-right">
+                    <p className="text-xs font-semibold text-muted-foreground mb-1 uppercase">Starting Price</p>
+                    <div className="flex items-baseline gap-1 sm:flex-col">
+                      <p className="font-bold text-primary text-2xl sm:text-3xl">₹{formData.servicePrice}</p>
+                      <p className="text-xs text-muted-foreground ml-auto sm:ml-0 sm:mt-1">{formData.servicePriceUnit}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Name Field */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2.5">
               Your Name <span className="text-destructive">*</span>
             </label>
             <input
@@ -297,13 +379,13 @@ Please reply to: ${formData.email}
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your full name"
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm sm:text-base"
+              className="w-full px-4 py-3 sm:py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-base sm:text-sm"
             />
           </div>
 
           {/* Email Field */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2.5">
               Email Address <span className="text-destructive">*</span>
             </label>
             <input
@@ -312,13 +394,13 @@ Please reply to: ${formData.email}
               value={formData.email}
               onChange={handleChange}
               placeholder="your.email@example.com"
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm sm:text-base"
+              className="w-full px-4 py-3 sm:py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-base sm:text-sm"
             />
           </div>
 
           {/* Mobile Number Field */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2.5">
               Mobile Number <span className="text-destructive">*</span>
             </label>
             <input
@@ -327,40 +409,55 @@ Please reply to: ${formData.email}
               value={formData.mobileNumber}
               onChange={handleChange}
               placeholder="10-digit mobile number"
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm sm:text-base"
+              className="w-full px-4 py-3 sm:py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-base sm:text-sm"
             />
           </div>
 
           {/* Service Selection */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2.5">
               Service <span className="text-destructive">*</span>
             </label>
             <select
               name="serviceTitle"
               value={formData.serviceTitle}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm sm:text-base"
+              onChange={(e) => {
+                const selectedTitle = e.target.value;
+                const selectedService = services.find(s => s.title === selectedTitle);
+                setFormData({
+                  ...formData,
+                  serviceTitle: selectedTitle,
+                  servicePrice: selectedService?.price || "",
+                  servicePriceUnit: selectedService?.price_unit || "onwards",
+                });
+              }}
+              className="w-full px-4 py-3 sm:py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-base sm:text-sm"
             >
               <option value="">Select a service</option>
-              {services.map((service) => (
-                <option key={service} value={service}>
-                  {service}
-                </option>
-              ))}
+              {loadingServices ? (
+                <option disabled>Loading services...</option>
+              ) : services.length > 0 ? (
+                services.map((service) => (
+                  <option key={service.id} value={service.title}>
+                    {service.title} - ₹{service.price} {service.price_unit}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No services available</option>
+              )}
             </select>
           </div>
 
           {/* Delivery Timeline */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2.5">
               Delivery Timeline
             </label>
             <select
               name="deliveryTimeline"
               value={formData.deliveryTimeline}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm sm:text-base"
+              className="w-full px-4 py-3 sm:py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-base sm:text-sm"
             >
               {deliveryOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -372,7 +469,7 @@ Please reply to: ${formData.email}
 
           {/* Message Field */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-semibold text-foreground mb-2.5">
               Project Details
             </label>
             <textarea
@@ -381,26 +478,26 @@ Please reply to: ${formData.email}
               onChange={handleChange}
               placeholder="Tell us more about your project requirements, design preferences, or any specific features you need..."
               rows={4}
-              className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors resize-none text-sm sm:text-base"
+              className="w-full px-4 py-3 sm:py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors resize-none text-base sm:text-sm"
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:pt-2 pb-4 sm:pb-0">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 sm:py-2 text-base sm:text-sm rounded-lg transition-colors"
+            >
+              {isSubmitting ? "Submitting..." : "Get Started"}
+            </Button>
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:flex-1"
+              className="w-full py-3 sm:py-2 text-base sm:text-sm rounded-lg"
             >
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:flex-1"
-            >
-              {isSubmitting ? "Submitting..." : "Get Started"}
             </Button>
           </div>
         </form>

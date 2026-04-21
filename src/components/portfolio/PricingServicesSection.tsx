@@ -19,7 +19,7 @@ interface PricingService {
 
 export default function PricingServicesSection() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState("");
+  const [selectedService, setSelectedService] = useState<PricingService | null>(null);
   const [services, setServices] = useState<PricingService[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,14 +45,14 @@ export default function PricingServicesSection() {
     fetchServices();
   }, []);
 
-  const handleGetStarted = (serviceName: string) => {
-    setSelectedService(serviceName);
+  const handleGetStarted = (service: PricingService) => {
+    setSelectedService(service);
     setIsFormOpen(true);
   };
 
   const handleFormClose = () => {
     setIsFormOpen(false);
-    setSelectedService("");
+    setSelectedService(null);
   };
 
   if (isLoading) {
@@ -154,7 +154,7 @@ export default function PricingServicesSection() {
 
                     {/* CTA Button */}
                     <Button
-                      onClick={() => handleGetStarted(service.title)}
+                      onClick={() => handleGetStarted(service)}
                       className={`w-full font-medium py-2 rounded-lg transition-all ${
                         service.popular
                           ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg"
@@ -185,7 +185,19 @@ export default function PricingServicesSection() {
             Have a unique project requirement? Let's discuss your specific needs and create a custom solution tailored to you.
           </p>
           <Button 
-            onClick={() => handleGetStarted("Custom Project")}
+            onClick={() => {
+              const customService: PricingService = {
+                id: "custom",
+                title: "Custom Project",
+                description: "Custom solution tailored to your needs",
+                price: "Custom",
+                price_unit: "quote",
+                features: [],
+                icon: "Settings",
+                popular: false,
+              };
+              handleGetStarted(customService);
+            }}
             variant="outline" 
             className="hover:bg-primary hover:text-primary-foreground"
           >

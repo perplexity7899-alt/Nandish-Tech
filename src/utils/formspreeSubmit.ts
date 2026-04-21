@@ -13,12 +13,12 @@ export interface FormspreeResponse {
 
 /**
  * Submit a response form to Formspree
- * @param formType - Type of form: 'contact-form' | 'service-inquiry' | 'mail-to-client'
+ * @param formType - Type of form: 'contact-form' | 'service-inquiry' | 'mail-to-client' | 'service-inquiry-acknowledgment'
  * @param data - Form data to submit
  * @returns Promise with success status
  */
 export async function submitFormspreeResponse(
-  formType: "contact-form" | "service-inquiry" | "mail-to-client",
+  formType: "contact-form" | "service-inquiry" | "mail-to-client" | "service-inquiry-acknowledgment",
   data: Record<string, string | number | boolean>
 ): Promise<FormspreeResponse> {
   try {
@@ -31,6 +31,8 @@ export async function submitFormspreeResponse(
       endpoint = FORMSPREE_ENDPOINTS.serviceInquiryResponse;
     } else if (formType === "mail-to-client") {
       endpoint = FORMSPREE_ENDPOINTS.mailToClientsResponse;
+    } else if (formType === "service-inquiry-acknowledgment") {
+      endpoint = FORMSPREE_ENDPOINTS.serviceInquiryResponse;
     }
 
     if (!endpoint) {
@@ -172,5 +174,55 @@ export async function submitMailToClientResponse(data: {
     recipient_email: data.recipientEmail,
     priority: data.priority || "normal",
     form_type: "mail-to-client",
+  });
+}
+
+/**
+ * Send service inquiry acknowledgment to client
+ * Sends the custom acknowledgment message with all form data to the client
+ */
+export async function submitServiceAcknowledgmentToClient(data: {
+  clientEmail: string;
+  clientName: string;
+  serviceTitle: string;
+  servicePrice?: string;
+  servicePriceUnit?: string;
+  message?: string;
+  mobileNumber?: string;
+  deliveryTimeline?: string;
+}) {
+  const acknowledgmentMessage = `Hi ${data.clientName}! 👋
+
+Thanks for reaching out 😊
+
+Your inquiry for **${data.serviceTitle}** has been received successfully.
+
+📋 **Your Inquiry Details:**
+- **Service:** ${data.serviceTitle}
+- **Price:** ${data.servicePrice} ${data.servicePriceUnit || "onwards"}
+- **Preferred Timeline:** ${data.deliveryTimeline || "Not specified"}
+- **Mobile Number:** ${data.mobileNumber || "Not provided"}
+- **Message:** ${data.message || "No additional message"}
+
+I'll review all your details and get back with the best solution.
+Looking forward to working with you!
+
+---
+Best regards,
+Nandish-Tech Team
+contactnandishtech@gmail.com`;
+
+  return submitFormspreeResponse("service-inquiry-acknowledgment", {
+    email: data.clientEmail,
+    _subject: `We Received Your Inquiry - ${data.serviceTitle}`,
+    client_name: data.clientName,
+    service_title: data.serviceTitle,
+    service_price: data.servicePrice || "Not specified",
+    service_price_unit: data.servicePriceUnit || "onwards",
+    delivery_timeline: data.deliveryTimeline || "Not specified",
+    mobile_number: data.mobileNumber || "Not provided",
+    inquiry_message: data.message || "No message",
+    acknowledgment_message: acknowledgmentMessage,
+    form_type: "service-inquiry-acknowledgment",
   });
 }
