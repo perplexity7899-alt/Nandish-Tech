@@ -10,6 +10,7 @@ import ClientsManager from "@/components/admin/ClientsManager";
 import ProjectsManager from "@/components/admin/ProjectsManager";
 import DeliverProjects from "@/components/admin/DeliverProjects";
 import AboutManager from "@/components/admin/AboutManager";
+import SocialsManager from "@/components/admin/SocialsManager";
 import ServicesManager from "@/components/admin/ServicesManager";
 import ServiceOfferManager from "@/components/admin/ServiceOfferManager";
 import MessagesPanel from "@/components/admin/MessagesPanel";
@@ -95,6 +96,7 @@ export default function Admin() {
     deliver: <DeliverProjects />,
     purchases: <AdminPurchasesManager />,
     about: <AboutManager />,
+    socials: <SocialsManager />,
     services: <ServicesManager />,
     serviceoffers: <ServiceOfferManager />,
     messages: <MessagesPanel />,

@@ -1,8 +1,8 @@
-import { LayoutDashboard, FolderOpen, User, Wrench, MessageSquare, LogOut, ArrowLeft, Send, Menu, X, DollarSign, Users, CreditCard, FileText, Mail } from "lucide-react";
+import { LayoutDashboard, FolderOpen, User, Wrench, MessageSquare, LogOut, ArrowLeft, Send, Menu, X, DollarSign, Users, CreditCard, FileText, Mail, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NotificationBell from "./NotificationBell";
 
-export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "serviceoffers" | "messages" | "pricing" | "clients" | "payments" | "custom-replies" | "admin-mail";
+export type AdminTab = "dashboard" | "projects" | "deliver" | "purchases" | "about" | "services" | "serviceoffers" | "messages" | "pricing" | "clients" | "payments" | "custom-replies" | "admin-mail" | "socials";
 
 interface Props {
   active: AdminTab;
@@ -23,6 +23,7 @@ const items: { id: AdminTab; label: string; icon: React.ComponentType<{ classNam
   { id: "purchases", label: "Purchases", icon: DollarSign },
   { id: "payments", label: "Payment Settings", icon: CreditCard },
   { id: "about", label: "About", icon: User },
+  { id: "socials", label: "Social Links", icon: Share2 },
   { id: "services", label: "Services", icon: Wrench },
   { id: "serviceoffers", label: "Services I Offer", icon: DollarSign },
   { id: "pricing", label: "Pricing", icon: DollarSign },
