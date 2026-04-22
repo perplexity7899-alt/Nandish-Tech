@@ -1,4 +1,4 @@
-import { CheckCircle, Zap, Truck, Award } from "lucide-react";
+import { CheckCircle, Zap, Truck, Award, DollarSign, Code, Heart } from "lucide-react";
 
 const features = [
   {
@@ -15,6 +15,21 @@ const features = [
     icon: Truck,
     title: "Fast Delivery",
     description: "Get your project instantly upon purchase",
+  },
+  {
+    icon: DollarSign,
+    title: "Affordable Pricing",
+    description: "High-quality services at budget-friendly prices suitable for startups and individuals",
+  },
+  {
+    icon: Code,
+    title: "Modern Technologies",
+    description: "We use the latest technologies like React, Node.js, and modern frameworks",
+  },
+  {
+    icon: Heart,
+    title: "Client Satisfaction",
+    description: "Client satisfaction is our top priority with clear communication and reliable service",
   }
 ];
 
@@ -31,7 +46,7 @@ export default function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, idx) => {
             const Icon = feature.icon;
             return (
