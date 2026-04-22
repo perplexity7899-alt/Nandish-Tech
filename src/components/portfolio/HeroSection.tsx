@@ -1,7 +1,8 @@
 import { usePortfolio } from "@/context/PortfolioContext";
+import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
 import { Github, Linkedin, Twitter, ExternalLink, ArrowRight, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   GitHub: Github,
@@ -16,11 +17,35 @@ export default function HeroSection() {
   const { data } = usePortfolio();
   const { heading, subheading, ctaText, ctaLink } = data.hero;
   const socials = data.socials || [];
-  const projects = data.projects || [];
+  const [sampleWorks, setSampleWorks] = useState<any[]>(data.sampleWorks || []);
   const [showMobileCard, setShowMobileCard] = useState(true);
-  
-  // Get first 3 projects as sample works
-  const sampleWorks = projects.slice(0, 3);
+
+  // Load sample works from Supabase
+  useEffect(() => {
+    const loadSampleWorks = async () => {
+      try {
+        const { data: supabaseData, error } = await supabase
+          .from("sample_works")
+          .select("*")
+          .eq("is_active", true)
+          .order("order_index", { ascending: true })
+          .limit(3);
+
+        if (error) {
+          console.error("Error loading sample works:", error);
+          // Fall back to portfolio context data
+          setSampleWorks(data.sampleWorks || []);
+        } else {
+          setSampleWorks(supabaseData || []);
+        }
+      } catch (error) {
+        console.error("Error fetching sample works:", error);
+        setSampleWorks(data.sampleWorks || []);
+      }
+    };
+
+    loadSampleWorks();
+  }, [data.sampleWorks]);
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden py-20">
@@ -53,9 +78,9 @@ export default function HeroSection() {
                 {sampleWorks.map((project, idx) => (
                   <a
                     key={project.id}
-                    href={project.liveUrl || "#projects"}
-                    target={project.liveUrl ? "_blank" : undefined}
-                    rel={project.liveUrl ? "noopener noreferrer" : undefined}
+                    href={project.live_url || "#projects"}
+                    target={project.live_url ? "_blank" : undefined}
+                    rel={project.live_url ? "noopener noreferrer" : undefined}
                     className="group flex items-start gap-3 p-3 rounded-lg hover:bg-primary/5 transition-all duration-200"
                   >
                     <div className="flex-shrink-0">
@@ -65,7 +90,7 @@ export default function HeroSection() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{project.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{project.techStack.slice(0, 2).join(", ")}</p>
+                      <p className="text-xs text-muted-foreground truncate">{Array.isArray(project.tech_stack) ? project.tech_stack.slice(0, 2).join(", ") : project.tech_stack}</p>
                     </div>
                   </a>
                 ))}
@@ -98,9 +123,9 @@ export default function HeroSection() {
                   {sampleWorks.map((project, idx) => (
                     <a
                       key={project.id}
-                      href={project.liveUrl || "#projects"}
-                      target={project.liveUrl ? "_blank" : undefined}
-                      rel={project.liveUrl ? "noopener noreferrer" : undefined}
+                      href={project.live_url || "#projects"}
+                      target={project.live_url ? "_blank" : undefined}
+                      rel={project.live_url ? "noopener noreferrer" : undefined}
                       className="group flex items-start gap-3 p-3 rounded-lg hover:bg-primary/5 transition-all duration-200"
                     >
                       <div className="flex-shrink-0">
@@ -110,7 +135,7 @@ export default function HeroSection() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{project.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">{project.techStack.slice(0, 3).join(", ")}</p>
+                        <p className="text-xs text-muted-foreground truncate">{Array.isArray(project.tech_stack) ? project.tech_stack.slice(0, 3).join(", ") : project.tech_stack}</p>
                       </div>
                     </a>
                   ))}
@@ -146,27 +171,24 @@ export default function HeroSection() {
                 {ctaText}
               </a>
 
-              {/* Social Links Card - Mobile */}
+              {/* Social Links - Mobile */}
               {socials.length > 0 && (
-                <div className="md:hidden bg-card/80 backdrop-blur-sm p-4 rounded-lg border border-border/50 w-fit">
-                  <p className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Connect</p>
-                  <div className="flex gap-2">
-                    {socials.map((social) => {
-                      const Icon = iconMap[social.platform] || ExternalLink;
-                      return (
-                        <a
-                          key={social.id}
-                          href={social.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground transition-all duration-300 group hover:shadow-md"
-                          title={social.platform}
-                        >
-                          <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        </a>
-                      );
-                    })}
-                  </div>
+                <div className="md:hidden flex gap-3">
+                  {socials.map((social) => {
+                    const Icon = iconMap[social.platform] || ExternalLink;
+                    return (
+                      <a
+                        key={social.id}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground transition-all duration-300 group hover:shadow-md"
+                        title={social.platform}
+                      >
+                        <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      </a>
+                    );
+                  })}
                 </div>
               )}
 

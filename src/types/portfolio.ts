@@ -10,6 +10,15 @@ export interface Project {
   pricing?: ProjectPricing;
 }
 
+export interface SampleWork {
+  id: string;
+  title: string;
+  description: string;
+  techStack: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+}
+
 export interface ProjectPricing {
   id: string;
   project_id: string;
@@ -87,4 +96,5 @@ export interface PortfolioData {
   services: Service[];
   messages: ContactMessage[];
   socials: SocialLink[];
+  sampleWorks: SampleWork[];
 }
